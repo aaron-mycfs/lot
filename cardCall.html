@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loteria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #e9ecef;
+    }
+
+    .container {
+      border: 3px solid black;
+      padding: 10px;
+      background: #f9f9f9;
+      max-width: 90vw;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+    }
+
+    .card {
+      border: 2px solid transparent;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      background: white;
+      transition: border 0.2s ease;
+    }
+
+    .card.selected {
+      border: 5px solid #007BFF;
+    }
+
+    .card img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    /* Popup window styling */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      border: 3px solid black;
+      background: white;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .popup img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #openPopupBtn, #nextCardBtn, #closePopupBtn {
+      padding: 6px 12px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #openPopupBtn:hover, #nextCardBtn:hover, #closePopupBtn:hover {
+      background: #0056b3;
+    }
+
+    #popupButtons {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <button id="openPopupBtn">Show Card Caller</button>
+
+  <!-- Popup window -->
+  <div class="popup" id="popup">
+    <img id="popupImg" src="" alt="Card" />
+    <div id="popupButtons">
+      <button id="nextCardBtn">Next Card</button>
+      <button id="closePopupBtn">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const totalImages = 16;
+    const numbers = Array.from({ length: totalImages }, (_, i) => i + 1);
+    const grid = document.getElementById("grid");
+    const body = document.body;
+
+    // Shuffle main board
+    for (let i = numbers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
+
+    // Display cards on board
+    numbers.forEach(num => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      const img = document.createElement("img");
+      img.src = `cards/${num}.jpg`;
+      img.alt = `Card ${num}`;
+      card.appendChild(img);
+      grid.appendChild(card);
+      card.addEventListener("click", () => {
+        card.classList.toggle("selected");
+        checkAllSelected();
+      });
+    });
+
+    function checkAllSelected() {
+      const allSelected = document.querySelectorAll(".card.selected").length === totalImages;
+      body.style.backgroundColor = allSelected ? "red" : "#e9ecef";
+    }
+
+    // ---------- Popup logic ----------
+    const popup = document.getElementById("popup");
+    const popupImg = document.getElementById("popupImg");
+    const openPopupBtn = document.getElementById("openPopupBtn");
+    const nextCardBtn = document.getElementById("nextCardBtn");
+    const closePopupBtn = document.getElementById("closePopupBtn");
+
+    // Master card list (could be 54 total if you have the full deck)
+    const allCards = Array.from({ length: 54 }, (_, i) => i + 1);
+    let remainingCards = [...allCards];
+
+    openPopupBtn.addEventListener("click", () => {
+      popup.style.display = "flex";
+      showNextCard();
+    });
+
+    closePopupBtn.addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+
+    nextCardBtn.addEventListener("click", showNextCard);
+
+    function showNextCard() {
+      if (remainingCards.length === 0) {
+        alert("All cards have been shown!");
+        return;
+      }
+
+      // Pick a random remaining card
+      const randomIndex = Math.floor(Math.random() * remainingCards.length);
+      const nextCard = remainingCards[randomIndex];
+
+      // Remove it from remaining
+      remainingCards.splice(randomIndex, 1);
+
+      // Update popup image
+      popupImg.src = `cards/${nextCard}.jpg`;
+      popupImg.alt = `Card ${nextCard}`;
+    }
+  </script>
+</body>
+</html>

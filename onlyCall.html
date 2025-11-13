@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loteria Card Caller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #e9ecef;
+    }
+
+    .popup {
+      width: 200px; /* small card-sized window */
+      border: 3px solid black;
+      border-radius: 10px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .popup img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 6px 12px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="popup">
+    <img id="cardImg" src="" alt="Card">
+    <button id="nextCardBtn">Next Card</button>
+    <button id="resetDeckBtn">Reset Deck</button>
+  </div>
+
+  <script>
+    // Full deck (update length if your deck is bigger)
+    const allCards = Array.from({ length: 54 }, (_, i) => i + 1);
+    let remainingCards = [...allCards];
+
+    const cardImg = document.getElementById("cardImg");
+    const nextCardBtn = document.getElementById("nextCardBtn");
+    const resetDeckBtn = document.getElementById("resetDeckBtn");
+
+    function showNextCard() {
+      if (remainingCards.length === 0) {
+        alert("All cards have been shown!");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * remainingCards.length);
+      const nextCard = remainingCards[randomIndex];
+      remainingCards.splice(randomIndex, 1);
+
+      cardImg.src = `cards/${nextCard}.jpg`;
+      cardImg.alt = `Card ${nextCard}`;
+    }
+
+    nextCardBtn.addEventListener("click", showNextCard);
+    resetDeckBtn.addEventListener("click", () => {
+      remainingCards = [...allCards];
+      cardImg.src = "";
+      cardImg.alt = "Card";
+    });
+
+    // Show the first card on page load
+    showNextCard();
+  </script>
+</body>
+</html>
